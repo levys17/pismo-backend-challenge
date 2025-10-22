@@ -17,15 +17,18 @@ public class Transaction {
     private Account account;
     private OperationTypeEnum operationType;
     private BigDecimal amount;
+    private BigDecimal balance;
     private LocalDateTime eventDate;
 
     public Transaction(final Account account,
                        final OperationTypeEnum operationTypeEnum,
                        final BigDecimal amount,
+                       final BigDecimal balance,
                        final LocalDateTime eventDate) {
         this.account = requireNonNull(account, "Account");
         this.operationType = requireNonNull(operationTypeEnum, "Operation Type");
         this.amount = requireNonNull(amount, "Amount");
+        this.balance = balance;
         this.eventDate = requireNonNull(eventDate, "Event Date");
     }
 }

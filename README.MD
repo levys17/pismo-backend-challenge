@@ -16,6 +16,7 @@ Each transaction has a specific operation type:
 **Rules**:
 - Transactions of type purchase and withdrawal are stored with negative amounts.
 - Transactions of type credit voucher are stored with positive amounts.
+- Transactions of type credit voucher updates balance value of previous debit transactions (i.e. the ones with negative amounts)
 ---
 
 ## Tech Stack

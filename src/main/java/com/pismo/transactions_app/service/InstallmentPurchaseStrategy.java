@@ -22,9 +22,11 @@ public class InstallmentPurchaseStrategy implements IOperationStrategy {
     public Transaction process(final BigDecimal amount, final Account account) {
         log.debug("Processing INSTALLMENT_PURCHASE transaction. accountId={} amount={}", account.getId(), amount);
         final BigDecimal adjustedAmount = amount.multiply(NEGATIVE_SIGN);
+        final BigDecimal adjustedBalance = amount.multiply(NEGATIVE_SIGN);
         return new Transaction(account,
                 OperationTypeEnum.INSTALLMENT_PURCHASE,
                 adjustedAmount,
+                adjustedBalance,
                 LocalDateTime.now());
     }
 

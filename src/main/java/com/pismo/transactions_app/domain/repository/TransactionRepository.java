@@ -6,6 +6,9 @@ import com.pismo.transactions_app.domain.repository.interfaces.ITransactionRepos
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class TransactionRepository implements ITransactionRepository {
@@ -13,7 +16,17 @@ public class TransactionRepository implements ITransactionRepository {
     private final ITransactionJpaRepository transactionJpaRepository;
 
     @Override
-    public TransactionEntity save(final TransactionEntity transactionEntity) {
-        return transactionJpaRepository.save(transactionEntity);
+    public List<TransactionEntity> saveAll(final List<TransactionEntity> transactionEntityList) {
+        return transactionJpaRepository.saveAll(transactionEntityList);
+    }
+
+    @Override
+    public Optional<TransactionEntity> findById(long id) {
+        return transactionJpaRepository.findById(id);
+    }
+
+    @Override
+    public List<TransactionEntity> findDebitOperationsByAccountId(final long accountId) {
+        return transactionJpaRepository.findDebitOperationsByAccountId(accountId);
     }
 }

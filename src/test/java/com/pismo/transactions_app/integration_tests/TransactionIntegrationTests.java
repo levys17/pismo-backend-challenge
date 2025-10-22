@@ -19,10 +19,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,16 +56,55 @@ public class TransactionIntegrationTests {
         expectedResponse.setAccountId(accountId);
         final String json = mapper.writeValueAsString(request);
 
-        final String responseContent = mockMvc.perform(post(TRANSACTION_BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
+        final String responseContent = createTransaction(json);
 
         final TransactionResponseDto response = mapper.readValue(responseContent, TransactionResponseDto.class);
         assertNotNull(response);
         assertResponse(expectedResponse, response);
 
+    }
+
+    @Test
+    public void processTransactions() throws Exception {
+        givenAccount();
+        TransactionRequestDto transaction = JsonUtils.getValidTransactionRequestDtoForTypeAndValue(OperationTypeEnum.NORMAL_PURCHASE, BigDecimal.valueOf(50), accountId);
+        Map<Long, BigDecimal> expectedBalanceForTransactionId = new HashMap<>();
+        String json = mapper.writeValueAsString(transaction);
+        TransactionResponseDto response = mapper.readValue(createTransaction(json), TransactionResponseDto.class);
+        expectedBalanceForTransactionId.put(response.getId(), BigDecimal.valueOf(0));
+
+        transaction = JsonUtils.getValidTransactionRequestDtoForTypeAndValue(OperationTypeEnum.NORMAL_PURCHASE, BigDecimal.valueOf(23.50), accountId);
+        json = mapper.writeValueAsString(transaction);
+        response = mapper.readValue(createTransaction(json), TransactionResponseDto.class);
+        expectedBalanceForTransactionId.put(response.getId(), BigDecimal.valueOf(-13.50));
+
+        transaction = JsonUtils.getValidTransactionRequestDtoForTypeAndValue(OperationTypeEnum.NORMAL_PURCHASE, BigDecimal.valueOf(18.70), accountId);
+        json = mapper.writeValueAsString(transaction);
+        response = mapper.readValue(createTransaction(json), TransactionResponseDto.class);
+        expectedBalanceForTransactionId.put(response.getId(), BigDecimal.valueOf(-18.70));
+
+        transaction = JsonUtils.getValidTransactionRequestDtoForTypeAndValue(OperationTypeEnum.CREDIT_VOUCHER, BigDecimal.valueOf(60), accountId);
+        json = mapper.writeValueAsString(transaction);
+        response = mapper.readValue(createTransaction(json), TransactionResponseDto.class);
+        expectedBalanceForTransactionId.put(response.getId(), BigDecimal.valueOf(0));
+
+        assertPreviousBalanceAfterCredit(expectedBalanceForTransactionId);
+    }
+
+    private void assertPreviousBalanceAfterCredit(Map<Long, BigDecimal> expectedBalanceForTransactionId) throws Exception {
+        for (Map.Entry<Long, BigDecimal> entry : expectedBalanceForTransactionId.entrySet()) {
+            BigDecimal transactionBalance = getTransactionById(entry.getKey()).getBalance();
+            assertEquals(entry.getValue(), transactionBalance);
+        }
+
+    }
+
+    private String createTransaction(String json) throws Exception {
+        return mockMvc.perform(post(TRANSACTION_BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
     }
 
     @Test
@@ -124,6 +167,13 @@ public class TransactionIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest());
+    }
+
+    private TransactionResponseDto getTransactionById(long id) throws Exception {
+        String responseContent = mockMvc.perform(get(TRANSACTION_BASE_URL + "/{id}", id))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        return mapper.readValue(responseContent, TransactionResponseDto.class);
     }
 
     private void assertResponse(final TransactionResponseDto expectedResponse, final TransactionResponseDto response) {

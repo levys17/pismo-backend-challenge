@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS `transactions_app`.`transactions` (
     account_id BIGINT NOT NULL,
     operation_type_id INT NOT NULL,
     amount DECIMAL(15,2) NOT NULL,
+    balance DECIMAL(15,2) NOT NULL,
     event_date DATETIME NOT NULL,
 
     CONSTRAINT fk_transaction_account FOREIGN KEY (account_id) REFERENCES accounts(id),

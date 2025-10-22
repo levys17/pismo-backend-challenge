@@ -22,9 +22,11 @@ public class WithdrawalStrategy implements IOperationStrategy {
     public Transaction process(final BigDecimal amount, final Account account) {
         log.debug("Processing WITHDRAWAL transaction. accountId={} amount={}", account.getId(), amount);
         final BigDecimal adjustedAmount = amount.multiply(NEGATIVE_SIGN);
+        final BigDecimal adjustedBalance = amount.multiply(NEGATIVE_SIGN);
         return new Transaction(account,
                 OperationTypeEnum.WITHDRAWAL,
                 adjustedAmount,
+                adjustedBalance,
                 LocalDateTime.now());
     }
 

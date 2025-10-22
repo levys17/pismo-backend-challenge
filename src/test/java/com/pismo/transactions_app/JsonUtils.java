@@ -8,6 +8,7 @@ import com.pismo.transactions_app.domain.enums.OperationTypeEnum;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 
 public final class JsonUtils {
 
@@ -25,6 +26,13 @@ public final class JsonUtils {
 
     public static TransactionRequestDto getValidTransactionRequestDtoForType(final OperationTypeEnum operationType) {
         return getObject(String.format("json/request/transaction/valid_%s.json", operationType.toString()), TransactionRequestDto.class);
+    }
+
+    public static TransactionRequestDto getValidTransactionRequestDtoForTypeAndValue(final OperationTypeEnum operationType, final BigDecimal value, final long accountId) {
+        TransactionRequestDto transactionRequestDto = getObject(String.format("json/request/transaction/valid_%s.json", operationType.toString()), TransactionRequestDto.class);
+        transactionRequestDto.setAmount(value);
+        transactionRequestDto.setAccountId(accountId);
+        return transactionRequestDto;
     }
 
     public static TransactionResponseDto getValidTransactionResponseDtoForType(final OperationTypeEnum operationType) {

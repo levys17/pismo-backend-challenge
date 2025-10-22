@@ -8,6 +8,7 @@ import com.pismo.transactions_app.domain.entities.AccountEntity;
 import com.pismo.transactions_app.domain.entities.TransactionEntity;
 import com.pismo.transactions_app.domain.enums.OperationTypeEnum;
 import com.pismo.transactions_app.domain.exceptions.AccountNotFoundException;
+import com.pismo.transactions_app.domain.exceptions.TransactionNotFoundException;
 import com.pismo.transactions_app.domain.repository.interfaces.IAccountRepository;
 import com.pismo.transactions_app.domain.repository.interfaces.ITransactionRepository;
 import com.pismo.transactions_app.service.interfaces.IOperationStrategy;
@@ -36,6 +37,12 @@ public class TransactionService implements ITransactionService {
         final Transaction transaction = strategy.process(request.getAmount(), Account.from(accountEntity));
         final TransactionEntity transactionEntity = transactionRepository.save(TransactionEntity.fromDomain(transaction));
 
+        return TransactionResponseDto.from(transactionEntity);
+    }
+
+    @Override
+    public TransactionResponseDto getById(long id) {
+        TransactionEntity transactionEntity = transactionRepository.findById(id).orElseThrow(() -> new TransactionNotFoundException(id));
         return TransactionResponseDto.from(transactionEntity);
     }
 }

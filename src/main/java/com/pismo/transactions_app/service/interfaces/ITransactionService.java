@@ -6,4 +6,6 @@ import com.pismo.transactions_app.api.transaction.v1.response.TransactionRespons
 public interface ITransactionService {
 
     TransactionResponseDto create(final TransactionRequestDto request);
+
+    TransactionResponseDto getById(final long id);
 }

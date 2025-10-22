@@ -27,6 +27,9 @@ public class TransactionEntity {
     @Column(name = "amount", nullable = false, updatable = false)
     private BigDecimal amount;
 
+    @Column(name = "balance", nullable = false)
+    private BigDecimal balance;
+
     @Column(name = "event_date", nullable = false, updatable = false)
     private LocalDateTime eventDate;
 
@@ -34,6 +37,7 @@ public class TransactionEntity {
         final TransactionEntity transactionEntity = new TransactionEntity();
         transactionEntity.setAccount(AccountEntity.fromDomain(transaction.getAccount()));
         transactionEntity.setAmount(transaction.getAmount());
+        transactionEntity.setBalance(transaction.getBalance());
         transactionEntity.setOperationType(OperationTypeEntity.fromEnum(transaction.getOperationType()));
         transactionEntity.setEventDate(transaction.getEventDate());
         return transactionEntity;

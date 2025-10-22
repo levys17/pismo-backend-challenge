@@ -18,6 +18,7 @@ public class TransactionResponseDto {
     private Long accountId;
     private Long operationTypeId;
     private BigDecimal amount;
+    private BigDecimal balance;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eventDate;
 
@@ -27,6 +28,7 @@ public class TransactionResponseDto {
         transactionResponseDto.setAccountId(transactionEntity.getAccount().getId());
         transactionResponseDto.setOperationTypeId(transactionEntity.getOperationType().getId());
         transactionResponseDto.setAmount(transactionEntity.getAmount());
+        transactionResponseDto.setBalance(transactionEntity.getBalance());
         transactionResponseDto.setEventDate(transactionEntity.getEventDate());
         return transactionResponseDto;
     }
